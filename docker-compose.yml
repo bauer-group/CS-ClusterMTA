@@ -1,0 +1,111 @@
+# =============================================================================
+# CS-ClusterMTA - Mail Server Stack
+# =============================================================================
+# Usage: ./clustermta.sh start
+#        docker compose up -d
+#
+# Features:
+#   - Full mail server stack (SMTP, IMAP, POP3, Webmail)
+#   - ClamAV antivirus protection
+#   - Rspamd spam filtering
+#   - Roundcube webmail interface
+#   - Let's Encrypt SSL/TLS support
+#   - Custom BAUER GROUP branding
+#
+# Access:
+#   - Admin Panel: https://${SERVICE_HOSTNAME}/admin/
+#   - Webmail:     https://${SERVICE_HOSTNAME}/
+#
+# Network Mode:
+#   - Host mode required for proper mail server operation
+#   - Mail servers must bind to standard ports (25, 465, 587, etc.)
+#   - DKIM signing requires direct access to network interfaces
+# =============================================================================
+
+services:
+
+  ### Mail Server (Poste.io) ###
+  # Full-featured mail server based on Poste.io
+  # Includes: Postfix, Dovecot, Roundcube, Rspamd, ClamAV
+  mail-server:
+    build:
+      context: ./src
+      args:
+        POSTEIO_REPOSITORY: ${POSTEIO_REPOSITORY:-analogic/poste.io}
+        POSTEIO_VERSION: ${POSTEIO_VERSION:-2.5.8}
+    container_name: ${STACK_NAME:-clustermta}
+    hostname: ${SERVICE_HOSTNAME:-mx1.simply-send.com}
+    restart: unless-stopped
+    environment:
+      # Timezone (auto-detected during setup)
+      - TZ=${TIME_ZONE:-Etc/UTC}
+
+      # HTTPS Mode (ON/OFF)
+      # ON: Let's Encrypt certificates
+      # OFF: Self-signed certificates
+      - HTTPS=${HTTPS_MODE:-ON}
+
+      # Service Modules (TRUE=disabled, FALSE=enabled)
+      # Disabling ClamAV saves ~1GB RAM
+      - DISABLE_CLAMAV=${DISABLE_CLAMAV:-FALSE}
+      - DISABLE_RSPAMD=${DISABLE_RSPAMD:-FALSE}
+      - DISABLE_ROUNDCUBE=${DISABLE_ROUNDCUBE:-FALSE}
+
+      # Custom HTTP/HTTPS ports (for Traefik integration)
+      # Default: 80/443 (standard ports)
+      # Behind Traefik: 8080/8443 (avoid conflict with reverse proxy)
+      - HTTP_PORT=${HTTP_PORT:-80}
+      - HTTPS_PORT=${HTTPS_PORT:-443}
+
+    # Port documentation (host mode binds all ports directly)
+    # ┌───────┬─────────────┬──────────────────────────────────┐
+    # │ Port  │ Protocol    │ Description                      │
+    # ├───────┼─────────────┼──────────────────────────────────┤
+    # │ 25    │ SMTP        │ Incoming mail (MTA-to-MTA)       │
+    # │ 80    │ HTTP        │ Web interface, ACME challenges   │
+    # │ 110   │ POP3        │ Mail retrieval (legacy)          │
+    # │ 143   │ IMAP        │ Mail synchronization             │
+    # │ 443   │ HTTPS       │ Secure web interface             │
+    # │ 465   │ SMTPS       │ Secure SMTP submission           │
+    # │ 587   │ Submission  │ SMTP submission (STARTTLS)       │
+    # │ 993   │ IMAPS       │ Secure IMAP                      │
+    # │ 995   │ POP3S       │ Secure POP3 (legacy)             │
+    # │ 4190  │ Sieve       │ Mail filtering rules             │
+    # └───────┴─────────────┴──────────────────────────────────┘
+    expose:
+      - 25/tcp
+      - 80/tcp
+      - 110/tcp
+      - 143/tcp
+      - 443/tcp
+      - 465/tcp
+      - 587/tcp
+      - 993/tcp
+      - 995/tcp
+      - 4190/tcp
+
+    volumes:
+      # Persistent mail data (emails, accounts, certificates, etc.)
+      - mail-data:/data
+
+    # Host network mode required for mail servers
+    # - Bind to standard mail ports
+    # - Proper IP detection for SPF/DKIM
+    # - No NAT complications
+    network_mode: host
+
+    # Log rotation to prevent disk fill
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+
+### Volumes ###
+volumes:
+  # Mail server data (emails, configuration, certificates)
+  # Backup with: ./clustermta.sh backup
+  mail-data:
+    driver: local
+    name: ${STACK_NAME:-clustermta}-data

@@ -1,0 +1,29 @@
+# ==============================================================================
+# Traefik Dynamic Configuration for CS-ClusterMTA
+# ==============================================================================
+#
+# This file is used for optional Traefik integration when the mail server
+# runs on custom HTTP ports (e.g., 8080/8443) in host network mode.
+#
+# Copy to your Traefik configuration directory:
+#   cp config/traefik/mail-server.yml /opt/edgeproxy/configuration/traefik/extensions/
+#
+# Adjust the values below to match your setup:
+#   - Host rule: your mail server hostname
+#   - Backend URL: your server IP and HTTP port
+#
+# ==============================================================================
+
+http:
+  routers:
+    mx1_simply-send_com-http:
+      rule: "Host(`mx1.simply-send.com`)"
+      entryPoints:
+        - web
+      service: mx1_simply-send_com
+
+  services:
+    mx1_simply-send_com:
+      loadBalancer:
+        servers:
+          - url: "http://10.10.0.1:8080"
