@@ -193,6 +193,58 @@ Edit `/opt/clustermta/.env` to customize your installation.
 | `HTTP_PORT` | `80` | HTTP port for web interface |
 | `HTTPS_PORT` | `443` | HTTPS port for secure web interface |
 
+### Multi-IP Support (Optional)
+
+Control which IP addresses the mail server listens on and sends from. Useful for multi-homed servers or running multiple instances.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LISTEN_ON` | `*` | IPs for incoming connections |
+| `SEND_ON` | *(same as LISTEN_ON)* | IP for outgoing mail |
+
+**LISTEN_ON Values:**
+
+| Value | Description |
+|-------|-------------|
+| `*` | Listen on all interfaces (default, standard Poste.io behavior) |
+| `host` | Listen only on hostname's resolved IPs |
+| `1.2.3.4` | Listen on specific IP address |
+| `1.2.3.4 5.6.7.8` | Listen on multiple IPs (space-separated) |
+
+**Examples:**
+
+```bash
+# All interfaces (default)
+LISTEN_ON=*
+
+# Single IPv4
+LISTEN_ON=116.202.101.48
+
+# IPv4 + IPv6
+LISTEN_ON="116.202.101.48 2a01:4f8:c012:754d::1"
+
+# Different send IP
+LISTEN_ON="116.202.101.48 116.202.101.49"
+SEND_ON=116.202.101.49
+```
+
+**Affected Services:**
+- Dovecot (IMAP/POP3)
+- Haraka SMTP (Port 25)
+- Haraka Submission (Ports 587, 465)
+- Postfix (outbound SMTP via SEND_ON)
+
+### Roundcube Plugins
+
+ClusterMTA enables the following built-in Roundcube plugins by default:
+
+| Plugin | Description |
+|--------|-------------|
+| `persistent_login` | "Keep me logged in" checkbox for persistent sessions |
+| `swipe` | Swipe gestures for mobile/touch devices |
+
+These plugins are pre-installed in Poste.io but not enabled by default. ClusterMTA activates them via the init script `92-roundcube-plugins.sh`.
+
 ## Ports
 
 | Port | Protocol | Description |
@@ -364,6 +416,86 @@ Internet → Traefik (443) → mail-server (8443)
 ```
 
 > **Note**: Only HTTP/HTTPS traffic goes through Traefik. Mail protocols (SMTP, IMAP, POP3) must be exposed directly.
+
+## Advanced Customization
+
+Poste.io 2.5.x provides official mechanisms for customization that persist across container updates. These methods are recommended for advanced users who need additional customization beyond what ClusterMTA provides.
+
+### Configuration Overrides (`/data/_override/`)
+
+Override any configuration file without modifying the container:
+
+```bash
+# Structure mirrors the root filesystem
+/data/_override/
+├── etc/
+│   ├── dovecot/
+│   │   └── conf.d/
+│   │       └── 99-custom.conf      # Custom Dovecot settings
+│   ├── postfix/
+│   │   └── main.cf.d/
+│   │       └── 99-custom.cf        # Custom Postfix settings
+│   └── rspamd/
+│       └── local.d/
+│           └── custom.conf         # Custom Rspamd settings
+└── opt/
+    └── admin/
+        └── templates/
+            └── custom.twig         # Custom admin templates
+```
+
+Files in `/data/_override/` are copied to their corresponding locations at container startup, overwriting the original files.
+
+### External Roundcube Plugins (`/data/roundcube-plugins/`)
+
+Install additional Roundcube plugins that aren't bundled with Poste.io:
+
+```bash
+# Example: Install a custom plugin
+cd /data/roundcube-plugins/
+git clone https://github.com/example/custom-plugin.git
+
+# Plugin is automatically loaded on next container restart
+```
+
+> **Note**: Built-in plugins (like `persistent_login`, `swipe`) should be enabled via config, not installed here. ClusterMTA already enables common built-in plugins.
+
+### Custom Haraka Plugins (`/data/haraka/`)
+
+Add custom Haraka SMTP plugins:
+
+```bash
+/data/haraka/
+├── smtp/           # For port 25 (incoming mail)
+│   └── plugins/
+│       └── custom_plugin.js
+└── submission/     # For ports 587/465 (submission)
+    └── plugins/
+        └── custom_plugin.js
+```
+
+### Roundcube Encryption Key (`DES_KEY`)
+
+For persistent Roundcube sessions across container restarts, set a stable encryption key:
+
+```bash
+# In .env or docker-compose.yml
+DES_KEY=your-random-32-character-string
+```
+
+Without this, Roundcube generates a new key on each restart, invalidating existing sessions.
+
+### ClusterMTA Custom Scripts
+
+ClusterMTA uses s6-overlay init scripts for its customizations:
+
+| Script | Purpose |
+|--------|---------|
+| `91-bind-hostname.sh` | Multi-IP binding (LISTEN_ON/SEND_ON) |
+| `92-roundcube-plugins.sh` | Enable built-in Roundcube plugins |
+| `93-custom-branding.sh` | BAUER GROUP branding |
+
+These scripts run after Poste.io's own initialization (numbered 90+).
 
 ## Troubleshooting
 

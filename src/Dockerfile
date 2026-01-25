@@ -45,6 +45,7 @@ LABEL org.opencontainers.image.source="https://github.com/bauer-group/CS-Cluster
 LABEL org.opencontainers.image.url="https://github.com/bauer-group/CS-ClusterMTA"
 LABEL org.opencontainers.image.documentation="https://github.com/bauer-group/CS-ClusterMTA#readme"
 LABEL org.opencontainers.image.description="Customized Poste.io mail server with BAUER GROUP modifications."
+LABEL org.opencontainers.image.version="0.0.0"
 
 LABEL org.opencontainers.image.base.name="docker.io/${POSTEIO_REPOSITORY}"
 LABEL org.opencontainers.image.base.version="${POSTEIO_VERSION}"
