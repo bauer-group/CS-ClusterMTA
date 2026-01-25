@@ -11,6 +11,8 @@
 #   - Roundcube webmail interface
 #   - Let's Encrypt SSL/TLS support
 #   - Custom BAUER GROUP branding
+#   - Multi-IP support (LISTEN_ON/SEND_ON)
+#   - Roundcube plugins (persistent_login, swipe)
 #
 # Access:
 #   - Admin Panel: https://${SERVICE_HOSTNAME}/admin/
@@ -56,6 +58,18 @@ services:
       # Behind Traefik: 8080/8443 (avoid conflict with reverse proxy)
       - HTTP_PORT=${HTTP_PORT:-80}
       - HTTPS_PORT=${HTTPS_PORT:-443}
+
+      # Multi-IP Support (Optional)
+      # ┌──────────┬─────────────────────────────────────────────────────────┐
+      # │ Value    │ Description                                             │
+      # ├──────────┼─────────────────────────────────────────────────────────┤
+      # │ *        │ Listen on all interfaces (default, standard Poste.io)   │
+      # │ host     │ Listen on hostname's IPs only                           │
+      # │ 1.2.3.4  │ Listen on specific IP                                   │
+      # │ 1.2 5.6  │ Listen on multiple IPs (space-separated)                │
+      # └──────────┴─────────────────────────────────────────────────────────┘
+      - LISTEN_ON=${LISTEN_ON:-*}
+      - SEND_ON=${SEND_ON:-}
 
     # Port documentation (host mode binds all ports directly)
     # ┌───────┬─────────────┬──────────────────────────────────┐

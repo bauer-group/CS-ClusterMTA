@@ -10,6 +10,8 @@
 #   - Roundcube webmail interface
 #   - Let's Encrypt SSL/TLS support
 #   - Custom branding (favicon, colors)
+#   - Multi-IP support (LISTEN_ON/SEND_ON)
+#   - Roundcube plugins (persistent_login, swipe)
 #
 # Build:  docker compose build
 # Run:    docker compose up -d
@@ -68,12 +70,15 @@ RUN set -ex && \
 # Copy all custom assets (branding, init scripts, etc.)
 # Directory structure:
 #   assets/
-#   ├── etc/cont-init.d/     # s6 init scripts
+#   ├── etc/cont-init.d/     # s6 init scripts (run after Poste.io scripts)
+#   │   ├── 91-bind-hostname.sh      # Multi-IP binding
+#   │   ├── 92-roundcube-plugins.sh  # Roundcube plugins
+#   │   └── 93-custom-branding.sh    # BAUER GROUP branding
 #   └── opt/                  # Custom files (favicon, etc.)
 COPY assets/ /
 
 # Make init scripts executable
-RUN chmod +x /etc/cont-init.d/99-custom-bauergroup.sh
+RUN chmod +x /etc/cont-init.d/*.sh
 
 # ───────────────────────────────────────────────────────────────────────────────
 # Usage
