@@ -1,3 +1,9 @@
+## [0.3.0](https://github.com/bauer-group/CS-ClusterMTA/compare/v0.2.0...v0.3.0) (2026-05-21)
+
+### 🚀 Features
+
+* Update Poste.io version to 2.5.12 in configuration files ([993405b](https://github.com/bauer-group/CS-ClusterMTA/commit/993405b0825a55ca9389d8552f510709b7c74f2e))
+
 ## [0.2.0](https://github.com/bauer-group/CS-ClusterMTA/compare/v0.1.0...v0.2.0) (2026-01-25)
 
 ### 🚀 Features
