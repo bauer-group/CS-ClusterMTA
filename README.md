@@ -158,7 +158,7 @@ Edit `/opt/clustermta/.env` to customize your installation.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `POSTEIO_REPOSITORY` | `analogic/poste.io` | Docker image repository |
-| `POSTEIO_VERSION` | `2.5.8` | Image version tag |
+| `POSTEIO_VERSION` | `2.5.12` | Image version tag |
 
 ### General Settings
 
