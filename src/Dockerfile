@@ -72,14 +72,28 @@ RUN set -ex && \
 # Directory structure:
 #   assets/
 #   ├── etc/cont-init.d/     # s6 init scripts (run after Poste.io scripts)
+#   │   ├── 25-le-cert-sync.sh       # Let's Encrypt cert self-heal (startup)
 #   │   ├── 91-bind-hostname.sh      # Multi-IP binding
 #   │   ├── 92-roundcube-plugins.sh  # Roundcube plugins
 #   │   └── 93-custom-branding.sh    # BAUER GROUP branding
-#   └── opt/                  # Custom files (favicon, etc.)
+#   ├── etc/cron.d/          # cron jobs
+#   │   └── clustermta-le-sync       # Let's Encrypt cert self-heal (periodic)
+#   ├── etc/logrotate.d/     # log rotation
+#   │   └── clustermta               # rotates the cert-sync log
+#   └── opt/                  # Custom files (favicon, cert-sync script, etc.)
 COPY assets/ /
 
-# Make init scripts executable
-RUN chmod +x /etc/cont-init.d/*.sh
+# Make init scripts and the cert-sync helper executable; cron.d files must be
+# 0644 and owned by root (not executable) or cron ignores them.
+#
+# Also harden /etc/ssl: the upstream image ships it world-writable (0777), which
+# lets any non-root in-container process plant a symlink that a later root-owned
+# certificate copy would follow. 0755 closes this for both the cert-sync helper
+# and the upstream 21-certificate.sh cert copies.
+RUN chmod +x /etc/cont-init.d/*.sh /opt/clustermta/le-cert-sync.sh && \
+    chmod 0644 /etc/cron.d/clustermta-le-sync /etc/logrotate.d/clustermta && \
+    chown root:root /etc/cron.d/clustermta-le-sync /etc/logrotate.d/clustermta && \
+    chmod 0755 /etc/ssl
 
 # ───────────────────────────────────────────────────────────────────────────────
 # Usage

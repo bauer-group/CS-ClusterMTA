@@ -1,0 +1,12 @@
+# =============================================================================
+# ClusterMTA - Let's Encrypt certificate self-heal
+# =============================================================================
+# Reconciles the served certificate (/etc/ssl/*) with the freshest valid
+# Let's Encrypt certificate every 15 minutes, independent of whether upstream
+# renew() completed its activation/reload step. Idempotent: only acts on real
+# drift, so a healthy system does nothing here.
+#
+# Complements the upstream renewal cron (/etc/cron.d/lets-encrypt, 06:25 daily);
+# runs offset so activation follows shortly after a successful issuance.
+# =============================================================================
+*/15 * * * * root /opt/clustermta/le-cert-sync.sh --cron >> /data/log/clustermta/cert-sync.log 2>&1

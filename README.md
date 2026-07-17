@@ -522,6 +522,39 @@ sudo ./clustermta.sh logs
 # Admin Panel → System Settings → TLS Certificate → Renew
 ```
 
+#### Automatic certificate self-heal
+
+Poste.io renews Let's Encrypt certificates daily, but its renewal is not
+atomic: the fresh certificate is written to
+`/data/ssl/letsencrypt/<domain>/` and only *afterwards* copied into the live
+store `/etc/ssl/` and reloaded. If anything in between fails (most commonly the
+renewal-notification e-mail), the fresh certificate is never activated and the
+served certificate stays frozen until it expires — while a perfectly valid
+certificate already sits in the container.
+
+ClusterMTA ships a **self-heal reconcile** (`/opt/clustermta/le-cert-sync.sh`)
+that closes this gap. It runs at container start and every 15 minutes via cron,
+compares the served certificate against the freshest valid Let's Encrypt
+certificate, and re-activates + reloads the daemons only when they drift. It is
+idempotent and a no-op on healthy systems and on self-signed / proxy setups.
+
+```bash
+# Watch what the self-heal did
+docker exec <container_name> tail -n 50 /data/log/clustermta/cert-sync.log
+
+# Trigger a reconcile immediately (instead of waiting for the 15-min cron)
+docker exec <container_name> /opt/clustermta/le-cert-sync.sh --cron
+```
+
+Manual last-resort fix (should no longer be necessary): re-point the served
+certificate at the current Let's Encrypt files and restart the container.
+
+```bash
+ln -sf /data/ssl/letsencrypt/<domain>/fullchain.pem /data/ssl/server.crt
+ln -sf /data/ssl/letsencrypt/<domain>/chain.pem     /data/ssl/ca.crt
+ln -sf /data/ssl/letsencrypt/<domain>/private.pem   /data/ssl/server.key
+```
+
 ### Mail delivery issues
 
 ```bash

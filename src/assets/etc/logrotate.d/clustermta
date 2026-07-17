@@ -1,0 +1,19 @@
+# =============================================================================
+# ClusterMTA - log rotation for the Let's Encrypt cert self-heal
+# =============================================================================
+# The */15 cron (clustermta-le-sync) appends to this file on the persistent
+# /data volume. Healthy systems are silent, but persistent conditions (e.g. an
+# expired upstream source cert) log on every run, so rotate to bound growth.
+# The upstream image runs logrotate daily and processes /etc/logrotate.d/*.
+# =============================================================================
+/data/log/clustermta/*.log {
+    weekly
+    rotate 12
+    size 1M
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    create 640 mail mail
+}
