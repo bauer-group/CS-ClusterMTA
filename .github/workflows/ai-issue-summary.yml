@@ -23,7 +23,6 @@ jobs:
       add-labels: true
       add-priority: true
       translate: ""
-      model: "gpt-4o"
       comment-template: |
         ## AI Analysis
 
