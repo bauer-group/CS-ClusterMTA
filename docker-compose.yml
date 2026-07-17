@@ -34,7 +34,7 @@ services:
       context: ./src
       args:
         POSTEIO_REPOSITORY: ${POSTEIO_REPOSITORY:-analogic/poste.io}
-        POSTEIO_VERSION: ${POSTEIO_VERSION:-2.5.12}
+        POSTEIO_VERSION: ${POSTEIO_VERSION:-2.5.14}
     container_name: ${STACK_NAME:-clustermta}
     hostname: ${SERVICE_HOSTNAME:-mx1.simply-send.com}
     restart: unless-stopped

@@ -174,7 +174,7 @@ POSTEIO_REPOSITORY=analogic/poste.io
 
 # Poste.io version
 # https://hub.docker.com/r/analogic/poste.io/tags
-POSTEIO_VERSION=2.5.12
+POSTEIO_VERSION=2.5.14
 
 
 # ==============================================================================

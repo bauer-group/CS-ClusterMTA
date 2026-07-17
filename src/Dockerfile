@@ -21,7 +21,7 @@
 # Build Arguments
 # ───────────────────────────────────────────────────────────────────────────────
 ARG POSTEIO_REPOSITORY="analogic/poste.io"
-ARG POSTEIO_VERSION="2.5.12"
+ARG POSTEIO_VERSION="2.5.14"
 
 # ───────────────────────────────────────────────────────────────────────────────
 # Base Image
