@@ -30,8 +30,14 @@ cd "$SCRIPT_DIR"
 
 # Check if this is a git repository
 if [ ! -d ".git" ]; then
-    print_error "This is not a git repository!"
-    echo "Cannot perform git-based update."
+    print_error "This is not a git repository - cannot update via git."
+    echo ""
+    echo "This installation was created without git (legacy copy-based install)."
+    echo "Repair it in place (keeps your .env and backups/) by re-running the"
+    echo "installer, which converts $SCRIPT_DIR into a proper git checkout:"
+    echo ""
+    echo "  curl -fsSL https://raw.githubusercontent.com/bauer-group/CS-ClusterMTA/main/setup.sh | sudo bash"
+    echo ""
     exit 1
 fi
 

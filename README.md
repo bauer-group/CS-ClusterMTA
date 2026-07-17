@@ -44,28 +44,36 @@ A production-ready, self-hosted mail server based on [Poste.io](https://poste.io
 
 ### One-Line Install (Recommended)
 
+`setup.sh` installs into `/opt/clustermta` as a **git checkout**, so
+`./clustermta.sh update` keeps working afterwards:
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/bauer-group/CS-ClusterMTA/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/bauer-group/CS-ClusterMTA/main/setup.sh | sudo bash
 ```
 
 With auto-start:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/bauer-group/CS-ClusterMTA/main/install.sh | sudo bash -s -- --start
+curl -fsSL https://raw.githubusercontent.com/bauer-group/CS-ClusterMTA/main/setup.sh | sudo bash -s -- --start
 ```
+
+> The old `install.sh` URL still works — it simply forwards to `setup.sh`.
+> Re-running the installer over an existing install is safe: it updates the
+> checkout and **repairs a legacy non-git install in place** (your `.env` and
+> `backups/` are preserved).
 
 ### Manual Installation
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/bauer-group/CS-ClusterMTA.git
-cd CS-ClusterMTA
+# 1. Clone the repository straight into the install location
+sudo git clone https://github.com/bauer-group/CS-ClusterMTA.git /opt/clustermta
+cd /opt/clustermta
 
 # 2. Run setup (creates folders, .env with auto-detected values)
 sudo ./setup.sh
 
 # 3. Edit configuration (set your hostname!)
-nano .env
+sudo nano /opt/clustermta/.env
 
 # 4. Start mail server
 sudo ./clustermta.sh start
@@ -73,6 +81,9 @@ sudo ./clustermta.sh start
 # 5. Access admin panel
 #    https://<your-hostname>/admin/
 ```
+
+> Running `sudo ./setup.sh` from a clone in a different directory is also fine —
+> it bootstraps the install into `/opt/clustermta` and continues from there.
 
 ## Requirements
 
