@@ -1,3 +1,14 @@
+## [0.4.0](https://github.com/bauer-group/CS-ClusterMTA/compare/v0.3.0...v0.4.0) (2026-07-17)
+
+### 🚀 Features
+
+* Update Poste.io version to 2.5.14 in configuration files and scripts ([10c1452](https://github.com/bauer-group/CS-ClusterMTA/commit/10c14527aa913ed5c69693fc04c581b4feec5def))
+
+### 🐛 Bug Fixes
+
+* Remove deprecated model parameter from AI summary workflow ([b7ec8f5](https://github.com/bauer-group/CS-ClusterMTA/commit/b7ec8f578aa357819f7326000324761993debafe))
+* **ssl:** fixed Let's Encrypt cert not activating on renewal ([01097c8](https://github.com/bauer-group/CS-ClusterMTA/commit/01097c84baa32ac46cebc423245fdef26aa7ed8c))
+
 ## [0.3.0](https://github.com/bauer-group/CS-ClusterMTA/compare/v0.2.0...v0.3.0) (2026-05-21)
 
 ### 🚀 Features
