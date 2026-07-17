@@ -1,3 +1,9 @@
+## [0.4.1](https://github.com/bauer-group/CS-ClusterMTA/compare/v0.4.0...v0.4.1) (2026-07-17)
+
+### 🐛 Bug Fixes
+
+* **install:** merged installer into setup.sh so update works ([391f08c](https://github.com/bauer-group/CS-ClusterMTA/commit/391f08c6ee32ee46b3589a3cc1558109e77af223))
+
 ## [0.4.0](https://github.com/bauer-group/CS-ClusterMTA/compare/v0.3.0...v0.4.0) (2026-07-17)
 
 ### 🚀 Features
